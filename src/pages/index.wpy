@@ -1,0 +1,427 @@
+<style lang="less" scoped>
+  /*变量*/
+  @totalW:100%;
+  @totalH:100%;
+  @pad20: 20rpx;
+
+  .boxSizing{
+    box-sizing: border-box;
+  }
+  .totalWH{
+    width:@totalW;
+    height:@totalH;
+  }
+  .fl{
+    float: left;
+  }
+  .fr{
+    float: right;
+  }
+
+  .carousel {
+    .swiper {
+      width: @totalW;
+      height: 340rpx;
+    }
+    .img {
+      .totalWH();
+    }
+  }
+  .content-bg{
+    width:@totalW;
+    padding: @pad20;
+    .boxSizing();
+    background-color: #F1F1F1;
+    .content-box{
+      margin-top: 20rpx;
+      .totalWH();
+      .app-item{
+        width:@totalW;
+        height:320rpx;
+        background-color: #FFF;
+        border:2rpx solid #eee;
+        margin-bottom: 16rpx;
+        padding: @pad20;
+        .boxSizing();
+        box-shadow: 0 4rpx 2rpx #DDD;
+
+        .app-image{
+          width:200rpx;
+          height:200rpx;
+          border:2rpx solid #CCC;
+          .boxSizing();
+          border-radius:20rpx;
+          .fl();
+        }
+        .app-desc{
+          width:304rpx;
+          height:200rpx;
+          padding:12rpx;
+          .boxSizing();
+          .fl();
+          .app-name{
+            color:#333;
+            font-size: 34rpx;
+            font-weight: 600;
+          }
+          .app-detail{
+            color:#888;
+            font-size: 24rpx;
+          }
+        }
+        .app-btn{
+          width:160rpx;
+          height:200rpx;
+          .fr();
+          .btn{
+            width:160rpx;
+            height:160rpx;
+            line-height:80rpx;
+            font-size:  26rpx;
+            background-color: #049BFF;
+            padding:40rpx 10rpx 20rpx 16rpx;
+            border-radius: 50%;
+            color: #FFF;
+            box-shadow:1rpx 1rpx 2rpx #333;
+            box-sizing:border-box;
+            &:active{
+               box-shadow:1rpx 1rpx 2rpx #333 inset;
+             }
+          }
+
+        }
+        .app-player{
+          width:@totalW;
+          height:60rpx;
+          line-height: 60rpx;
+          .fl();
+          .boxSizing();
+          margin-top:10rpx;
+          padding-top:10rpx;
+          border-top:2rpx solid #EEE;
+          .player-item{
+            width:54rpx;
+            height:54rpx;
+            border-radius: 50%;
+
+            .boxSizing();
+            .fl();
+            &:nth-child(2){
+               transform: translateX(-16rpx);
+             }
+            &:nth-child(3){
+               transform: translateX(-32rpx);
+             }
+            &:nth-child(4){
+               transform: translateX(-48rpx);
+             }
+            &:nth-child(5){
+               transform: translateX(-64rpx);
+             }
+          }
+          .player-desc{
+            color:#666;
+            font-size: 24rpx;
+            transform: translateX(-56rpx);
+            .fl();
+          }
+        }
+      }
+
+    }
+  }
+
+
+
+</style>
+<template >
+  <view>
+    <red-paper wx:if="{{showMask}}" :redPaper="redPaper"></red-paper>
+    <welfare-dialog wx:if="{{showQunDialog}}"></welfare-dialog>
+    <tip-dialog wx:if="{{showTip}}"></tip-dialog>
+    <image src="../static/images/carousel/logo1.png" style="width:100%;height:340rpx;"></image>
+    <view class="content-bg">
+      <view wx:if="{{showFuLiQun}}">
+        <view wx:if="{{loginOk}}">
+          <view wx:if="{{officialAccount}}">
+            <image src="../static/images/fuli.png" style="position:fixed;bottom:40rpx;right:40rpx;width:150rpx;height:130rpx;z-index: 1000" @tap="toGroup" catchtouchmove="banMove"></image>
+          </view>
+          <view wx:if="{{!officialAccount}}">
+            <button class="no-border"  style="position:fixed;bottom:40rpx;right:40rpx;width:150rpx;height:130rpx;z-index: 1000;background-color:transparent" @tap="toQun"><image src="../static/images/fuli.png" style="position:fixed;bottom:40rpx;right:40rpx;width:150rpx;height:130rpx;z-index: 1000;" catchtouchmove="banMove"></image></button>
+          </view>
+        </view>
+        <view wx:if="{{!loginOk}}">
+          <button class="no-border" open-type="getUserInfo"  bindgetuserinfo="bindGetUserInfo" style="position:fixed;bottom:40rpx;right:40rpx;width:150rpx;height:130rpx;z-index: 1000;background-color:transparent"><image src="../static/images/fuli.png" style="position:fixed;bottom:40rpx;right:40rpx;width:150rpx;height:130rpx;z-index: 1000;" catchtouchmove="banMove"></image></button>
+        </view>
+      </view>
+
+
+      <view class="content-box">
+        <view class="app-item" wx:for="{{appList}}" wx:key="{{item.id}}">
+          <view>
+           <image src="{{item.extra_info.logo_url}}" class="app-image"></image>
+          </view>
+
+          <view class="app-desc">
+            <view class="app-name" >{{item.extra_info.name}}</view>
+            <text class="app-detail">试玩要求：<text style="display: block">{{item.extra_info.desc}}</text></text>
+          </view>
+          <view class="app-btn">
+            <navigator wx:if="{{loginOk}}" style="text-align:center" target="miniProgram" open-type="navigate" app-id="{{item.extra_info.wx_mp_appid}}" path="{{item.extra_info.wx_mp_path}}" extra-data="" envVersion="release" class="btn" bindsuccess="appSuccess" bindfail="appFail" bindcomplete="appComplete"  data-index="{{index}}" data-productId="{{item.product_sale_id}}" data-reward="{{item.extra_info.reward_amount}}">{{item.extra_info.reward_amount}}<span data-amount="{{item.extra_info.reward_amount}}" data-finish="{{item.taskFinish}}" wx:if="{{item.taskFinish==undefined?true:false}}">积分</span></navigator>
+            <button wx:if="{{!loginOk}}" class="btn" type='primary' open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="bindGetUserInfo" data-productId="{{item.product_sale_id}}" data-reward="{{item.extra_info.reward_amount}}">{{item.extra_info.reward_amount }}<span data-amount="{{item.extra_info.reward_amount}}" data-finish="{{item.taskFinish}}" wx:if="{{item.taskFinish==undefined?true:false}}">积分</span></button>
+          </view>
+          <view class="app-player">
+            <view class="player-item" wx:for="{{txList[index]}}" wx:for-item="players" wx:key="{{players.id}}">
+              <image src="{{players.url}}" class="player-item" style="border:1rpx solid #ccc"></image>
+            </view>
+            <view class="player-desc">等{{item.extra_info.sales}}多人已经完成任务</view>
+          </view>
+
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import config from '../static/js/config'
+  var mta= require('../static/js/mta_analysis.js');
+  import WelfareDialog from '../components/welfareDialog'; //福利群引导弹框
+  import RedPaper from '../components/redPaper'; //红包
+  import TipDialog from '../components/tipDialog'; //提示
+  import indexMixin from '../mixins/indexMixin';
+  import {$http} from '../static/js/http';
+  import count from '../static/js/count';
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '首页',
+    };
+    components = {
+      "welfare-dialog":WelfareDialog,
+      "red-paper":RedPaper,
+      "tip-dialog":TipDialog
+    };
+    mixins = [indexMixin];
+    data = {
+      loginOk:false,//判断是否登入
+      fuid:"", //记录上一个用户uid
+      chn_id:"", //记录渠道id
+      showFuLiQun:true,//福利袋显示与隐藏
+      showMask:false, //红包及遮罩层显示与隐藏
+      showTip:false, //提示框显示与隐藏
+      showQunDialog:false, //引导进福利群的弹框显示与隐藏
+      officialAccount:false, //公众号组件
+      task: false, //判断是否任务触发
+      firstPlay: false, //判断是否第一次试玩当前小程序
+      taskOk:false,//判断是否完成任务
+      timeStart: null, //试玩小程序计时时间开始
+      timeEnd:null,//试玩小程序计时时间结束
+      timeOk:null, //试玩时间达标
+      productId:null, //小程序id
+      redPaper:0, //记录红包积分数量
+      canIUse: wepy.canIUse('official-account'), //判断当前版本是否可以使用公众号组件
+      appList:[
+        //小程序任务列表
+      ],
+    };
+    methods = {
+      banMove(){
+
+      },
+      toQun(){
+        wepy.pageScrollTo({
+          scrollTop: 0
+        });
+        this.showQunDialog = true;
+      },
+      handleContact (e) {
+        console.log(e.path);
+        console.log(e.query);
+      },
+      toGroup(){
+        wepy.navigateTo({
+          url:'./user/group'
+        })
+      },
+      appFail(res){
+        this.productId = res.currentTarget.dataset.productid;
+        count.cancelApp(this.productId);
+      },
+      appSuccess(res){
+        let index = res.currentTarget.dataset.index;
+        this.productId = res.currentTarget.dataset.productid;
+        this.redPaper = res.currentTarget.dataset.reward;
+        count.accessApp(this.productId);
+        if(this.redPaper=="已玩过"){
+          this.firstPlay = false;
+        }else{
+          this.firstPlay = true;
+        }
+        this.task = true;
+      },
+      appComplete(res){
+        this.productId = res.currentTarget.dataset.productid;
+        count.completeApp(this.productId);
+        if(this.task){
+          this.timeStart = new Date().getTime();
+          this.taskOk = true;
+          this.task = false;
+        }
+      },
+
+      previewImage: function (e) {
+        let current = e.target.dataset.src;
+        wepy.previewImage({
+          current: current,
+          urls: [current]
+        });
+      },
+
+      toBalance(){
+        this.showMask = false;
+        wepy.navigateTo({
+          url:'./user/balance'
+        });
+      }
+    };
+
+    events = {
+      // 关闭福利群引导弹框
+      qunDialogClose(){
+        mta.Event.stat("fuliqun", {"desc":"用户点击进入小程序客服，获取福利群二维码"});
+        this.showQunDialog = false;
+      },
+      //红包点击确定处理函数
+      sure(){
+        wepy.showTabBar({});
+        this.showMask = false;
+        this.task =false;
+        this.taskOk = false;
+        this.showFuLiQun = true;
+        let allPlay =  this.appList.every((item,index)=>{
+          return item.extra_info.reward_amount === "已玩过"
+        });
+        if(allPlay){
+          this.showTip = true;
+        }
+      },
+      //红包关闭后出现的提示框，点击确定后处理函数
+      toSpread(){
+        this.showTip = false;
+        wepy.switchTab({
+          url:'./spread'
+        });
+      },
+    };
+    onReady(){
+      if(wepy.getStorageSync("loginOk")){
+        this.loginOk = true;
+      }
+    }
+    onLoad(options){
+      wepy.showToast({
+        title: '加载中...',
+        icon: 'loading'
+      });
+      mta.Page.init();
+      // this.$parent.globalData.uid = options.uid;
+      this.officialAccount = this.$parent.globalData.officialAccount&&this.canIUse;
+      if(options.scene){
+        let params = options.scene.split("_");
+        this.chn_id = params[0];
+        this.fuid = params[1];
+
+      }else{
+        this.chn_id = options.chn_id;
+        this.fuid = options.uid;
+      }
+      wepy.setStorageSync("fuid",this.fuid);
+      wepy.setStorageSync("chn_id",this.chn_id);
+      wepy.setStorageSync("options",options);
+    }
+    onShow(){
+      //检测版本并更新版本
+      this.$parent.updateVersion();
+      $http('/get_version',"POST",{version_id:10001},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},(res)=>{
+        this.$parent.globalData.version = res.data.data.extra_info.danger;
+        this.$apply();
+      });
+      wepy.showTabBar({});
+
+      this.showFuLiQun = true;
+      this.loginOk =  wepy.getStorageSync("loginOk");
+      wepy.pageScrollTo({
+        scrollTop: 0
+      });
+      let that = this;
+
+      $http("/trade/get_product_list","POST",{type:2,page: 1},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+          that.appList = res.data.product_list;
+          that.$apply();
+          $http("/get_user_info","POST",{},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+            let achievement = res.data.user.extra_info.achievement;
+            for(let i=0;i<that.appList.length;i++){
+              let re = new RegExp(that.appList[i].product_sale_id);
+              for(let j in achievement){
+                if(re.test(j)){
+                  if(achievement[j]>=1&&that.appList[i].extra_info.every_life){
+                    that.appList[i].extra_info.reward_amount = "已玩过";
+                    that.appList[i].taskFinish = that.appList[i].product_sale_id;
+                  }
+                }
+              }
+            }
+            that.$apply();
+            wepy.hideToast();
+          });
+
+        });
+
+      if(this.taskOk){
+        let that = this;
+        this.timeEnd = new Date().getTime();
+        this.timeOk = this.timeEnd - this.timeStart;
+        this.task = false;
+        this.taskOk = false;
+        if(this.timeOk>config.taskTime){
+          if(this.firstPlay){
+            this.$parent.showLoading("红包正在路上",5000,false);
+            $http("/trade/consume","POST",{product_sale_id:this.productId,base_money:0.0},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+              that.showFuLiQun = false;
+              that.showMask = true;
+              wepy.hideTabBar({});
+              count.finishApp(that.productId);
+              this.$parent.hideLoading();
+              that.$apply();
+            });
+
+          }else{
+            this.$parent.showDialog("提示","您已经完成该任务，无法重复获取积分！","好的",false).then(()=>{
+              let allPlay =  that.appList.every((item,index)=>{
+                return item.extra_info.reward_amount === "已玩过"
+              });
+              if(allPlay){
+                that.showTip = true;
+                that.$apply();
+              }
+            });
+          }
+        }else{
+          count.failApp(this.productId); // 统计试玩小程序任务失败的数量
+          this.$parent.showDialog("提示","试玩小程序未超过30秒，试玩任务失败！","知道了",false)
+        }
+      }
+    };
+
+    bindGetUserInfo(e) {
+      let that = this;
+      this.$parent.login(e).then(()=>{
+        that.onShow();
+        that.loginOk = true;
+        that.$apply();
+      });
+    }
+  }
+
+</script>

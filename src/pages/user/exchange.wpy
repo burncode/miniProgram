@@ -1,0 +1,265 @@
+<style lang="less">
+  .srcoll_view{
+    position: absolute;
+    top:0rpx;
+    height: 60rpx;
+    font-size: 30rpx;
+    white-space: nowrap;
+    line-height: 60rpx;
+    color: #333;
+    animation:myfirst 30s linear infinite;
+
+
+    .show-text{
+      color:#FFF;
+      display: inline-block;
+    }
+
+
+  }
+  @keyframes myfirst
+  {
+    /*0% {translate(100%);}*/
+    /*100% {translate(-100%);}*/
+    0% {
+      margin-left: 100%;
+    }
+    100% {
+      margin-left: -6200rpx;
+    }
+  }
+  .scroll_view_border{
+    position: relative;
+    width: 100%;
+    height: 60rpx;
+    overflow: hidden;
+    background-color: #6fb8ff;
+    border-top:2rpx solid #056ed4;
+    border-bottom:2rpx solid #056ed4;
+  }
+  .money-red{
+    color:#DE4C56;margin-right: 6rpx;
+    font-weight:600;
+    font-size:33rpx;
+    display: inline-block;
+  }
+  .exchange{
+    width:100%;height:150%;background-color: #eee;
+  }
+  .top-image-box{
+    width:100%;height:240rpx;padding-top:20rpx;
+    .top-image{
+      width:100%;height:100%
+    }
+  }
+
+  .center-box{
+    width:100%;height:100%;padding: 20rpx;box-sizing: border-box;
+    .content{
+      width:100%;
+      .gift-item{
+        width:49%;height:350rpx;display: inline-block;border:2rpx solid #ccc;background-color: #fff;
+        .gift-image-box{
+          width:100%;height: 220rpx;box-sizing: border-box;padding:16rpx 16rpx 10rpx 16rpx;
+          .gift-image{
+            width:100%;height:100%;
+          }
+        }
+        .gift-detail-box{
+          padding:0 18rpx;box-sizing: border-box;color:#333;
+          .gift-detail{
+            font-size: 30rpx;
+          }
+        }
+        .exchange-btn{
+          width:200rpx;height:60rpx;line-height: 60rpx;font-size: 26rpx;vertical-align: middle;background-color:#049BFF;color:#f1f1f1;box-shadow:1rpx 1rpx 2rpx #333;
+          margin-top:16rpx;
+        &:active{
+           box-shadow:1rpx 1rpx 2rpx #333 inset;
+         }
+        }
+      }
+    }
+    .exchange-more-box{
+      margin-top: 40rpx;
+      .exchange-more-btn{
+        font-size: 35rpx;background-color: #049BFF;color:#FFF;
+         &:active{
+            opacity: 0.85;
+          }
+      }
+    }
+  }
+</style>
+
+
+<template>
+  <view class="exchange">
+    <view style="width:100%;height:120vh;background-color: rgba(0,0,0,0.8);z-index: 1000;position: absolute;top:0;left:0;" wx:if="{{showQunDialog}}" catchtouchmove="banMove">
+      <view style="width:600rpx;height:960rpx;margin-left: 50%;position: absolute;top:8vh;left:-300rpx;background-color: #fff;">
+        <view style="color:#fff;background-color: #049BFF;height:60rpx;line-height: 60rpx;padding-left: 30rpx">温馨提示</view>
+        <view style="padding:15rpx;border-bottom:2rpx solid #eee">
+          <view style="border:1rpx solid #eee">
+            <scroll-view scroll-y style="height: 740rpx;padding:15rpx;box-sizing: border-box" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" >
+              <view>
+                <view style="font-weight: bolder;font-size: 36rpx;">第一步：</view>
+                <view style="font-size: 32rpx;text-indent: 2rem">发送“1”给任务积分派客服，如下图所示：</view>
+                <view>
+                  <image src="../../static/images/step1.png" alt="" style="width:100%;height:350rpx;box-sizing:border-box;border:2rpx solid #ccc"></image>
+                </view>
+              </view>
+              <view>
+                <view style="font-weight: bolder;font-size: 36rpx;">第二步：</view>
+                <view style="font-size: 32rpx;text-indent: 2rem">第一步骤完成后，会收到任务积分派客服返回的二维码，<span style="color:#DE4C56">点击打开大图长按识别二维码</span>即可，如下图所示：</view>
+                <view>
+                  <image src="../../static/images/step2.png" alt="" style="width:100%;box-sizing:border-box;border:2rpx solid #ccc"></image>
+                </view>
+              </view>
+              <view>
+                <view style="font-weight: bolder;font-size: 36rpx;">第三步：</view>
+                <view style="font-size: 32rpx;text-indent: 2rem">第二步骤完成后，进入公众号，在公众号下面点击<span style="color:#DE4C56">“兑换积分”</span>即可，如下图所示：</view>
+                <view>
+                  <image src="../../static/images/get_jifen.png" alt="" style="width:100%;height:200rpx;box-sizing:border-box;border:2rpx solid #ccc"></image>
+                </view>
+              </view>
+            </scroll-view>
+          </view>
+        </view>
+        <view style="text-align: center;margin-top: 20rpx;"><button class="my-btn" open-type="contact" bindcontact="handleContact" @tap="fuliCount" style="color:#fff;background-color: #049BFF;width:200rpx;font-size: 32rpx;">确定</button></view>
+      </view>
+    </view>
+
+    <view class='scroll_view_border'>
+      <view class="srcoll_view" ><image style="width:30rpx;height:30rpx;vertical-align: middle;line-height: 30rpx;margin-bottom: 10rpx;margin-right: 20rpx;" src="../../static/images/laba.png"></image><text wx:for="{{textList}}" wx:key="{{index}}" class="show-text" >“{{item.name}}”邀请了{{item.count}}个好友，累计获得<text class="money-red">{{item.balance}}</text>积分<text style="width:100rpx;display: inline-block"></text></text></view>
+    </view>
+    <!--<view class="top-image-box">-->
+      <!--<image class="top-image" style="" src="../../static/images/exchange/top2.jpg"></image>-->
+    <!--</view>-->
+
+    <view class="center-box">
+      <view class="content">
+        <view class="gift-item" wx:for="{{exchangeGift}}" wx:key="{{item.id}}">
+          <view class="gift-image-box">
+            <image src="{{item.imageUrl}}" class="gift-image"></image>
+          </view>
+          <view class="gift-detail-box clearfix">
+            <view class="gift-detail"><span style="float: left;">剩余{{item.rest}}份</span><span style="float: right;"><span style="color:#DE4C56">{{item.gift}}</span>积分</span></view>
+          </view>
+          <button class="exchange-btn" @tap="exchange" data-gift="{{item.gift}}">立即兑换</button>
+        </view>
+      </view>
+
+      <view class="exchange-more-box" wx:if="{{!officialAccount}}">
+        <view style="margin-top: 20rpx;"><span style="font-size: 26rpx;color:#888;line-height: 36rpx;display: inline-block">温馨提示：扣除相应的积分，兑换相应的礼品，<span style="color:#DE4C56">兑换更多礼品请点击下面的按钮联系客服！</span></span></view>
+        <button class="exchange-more-btn" @tap="toQun">兑换更多礼品请联系客服</button>
+      </view>
+      <view wx:if="{{officialAccount}}">
+        <view style="margin-top: 20rpx;"><span style="font-size: 26rpx;color:#888;line-height: 36rpx;display: inline-block">温馨提示：扣除相应的积分，兑换相应的礼品。<span style="color:#DE4C56">兑换更多礼品请点关注下面的公众号！</span></span></view>
+        <official-account bindload="follow" binderror="followError">
+        </official-account>
+      </view>
+
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  var mta= require('../../static/js/mta_analysis.js')
+  export default class Exchange extends wepy.page{
+    config = {
+      navigationBarTitleText: '兑换礼品'
+    };
+    components = {};
+
+    data = {
+      showQunDialog:false,
+      canIUse: wepy.canIUse('official-account'),
+      officialAccount:false,
+      userInfo:{},    //存储用户信息
+      textList:[
+        {
+          name:"丽彩de蝶",count:"129",balance:"335.15"
+        },
+        {
+          name:"Kaven",count:"289",balance:"698.23"
+        },
+        {
+          name:"夏末吃泡面",count:"491",balance:"1297.85"
+        },
+        {
+          name:"超皮皮皮卡丘",count:"1152",balance:"16673.32"
+        },
+        {
+          name:"冬天与夏天",count:"451",balance:"3085.58"
+        },
+        {
+          name:"萧炎吹笛",count:"971",balance:"14358.55"
+        },
+        {
+          name:"玛丽闯乌龙",count:"667",balance:"2455.24"
+        },
+        {
+          name:"凤羽",count:"981",balance:"4535.00"
+        },
+//        {
+//          name:"离歌",count:"421",balance:"3014"
+//        },
+//        {
+//          name:"小车西西",count:"1244",balance:"12460"
+//        },
+//        {
+//          name:"猫吃鱼",count:"871",balance:"7878"
+//        },
+      ],
+      exchangeGift:[
+          {id:1,imageUrl:"../../static/images/exchange/hf0.3.jpg",gift:0.3,rest:978548},
+          {id:2,imageUrl:"../../static/images/exchange/hf1.jpg",gift:1,rest:684752},
+          {id:3,imageUrl:"../../static/images/exchange/hf5.jpg",gift:5,rest:437751},
+          {id:4,imageUrl:"../../static/images/exchange/hf10.jpg",gift:10,rest:234135},
+        ]
+    };
+    methods = {
+      fuliCount(){
+        this.showQunDialog = false;
+      },
+      toQun(){
+        this.showQunDialog = true;
+      },
+      handleContact (e) {
+        console.log(e.path);
+        console.log(e.query);
+      },
+      follow(res){
+        console.log("follow:",res)
+      },
+      followError(res){
+        console.log("followError:",res)
+      },
+      exchange(e){
+        switch(e.currentTarget.dataset.gift){
+          case 1: mta.Event.stat("exchange_1", {"desc":"兑换1积分"});break;
+          case 2: mta.Event.stat("exchange_2", {"desc":"兑换2积分"});break;
+          case 5: mta.Event.stat("exchange_5", {"desc":"兑换5积分"});break;
+          case 10: mta.Event.stat("exchange_10", {"desc":"兑换10积分"});break;
+          default:break;
+        }
+
+        if(this.officialAccount){
+          wepy.navigateTo({
+            url:'./gift'
+          });
+        }else{
+          this.showQunDialog = true;
+        }
+
+      }
+
+    };
+
+    events = {};
+    onLoad() {
+      this.officialAccount = this.$parent.globalData.officialAccount&&this.canIUse;
+    };
+  }
+</script>

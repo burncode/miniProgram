@@ -1,0 +1,242 @@
+<style lang="less">
+  .cash{
+    width:100%;
+    height:1300rpx;
+    background-color: #F5F5F5;
+    padding:140rpx 30rpx 0 30rpx;
+    box-sizing:border-box;
+    .user-image{
+      width:170rpx;
+      height:170rpx;
+      border-radius: 50%;
+      border:2rpx solid #fff;
+      position:absolute;
+      margin-left:50%;
+      top: 40rpx;
+      left: -85rpx;
+
+    }
+    .cash-box{
+      width:100%;
+      height:630rpx;
+      background-color: #FFF;
+      padding:70rpx 30rpx 10rpx 30rpx;
+      box-sizing: border-box;
+      font-size: 28rpx;
+      .box1{
+        line-height:80rpx;
+        .cash-sum{
+          float: left;
+          color:#666;
+
+        }
+        .sum-number{
+          font-size: 42rpx;
+          float: left;
+          margin-left: 30rpx;
+
+          .red{
+            color:#DE4C56;
+          }
+        }
+      }
+      .tip{
+        color: #DE4C56;
+        font-size: 24rpx;
+      }
+      .box2{
+
+        line-height: 80rpx;
+        color:#666;
+      }
+      .input-cash{
+        position: relative;
+        line-height: 160rpx;
+        font-size: 42rpx;
+        .icon{
+          padding: 0;
+          color: #666;
+          position: absolute;
+          left: 10rpx;
+          bottom: -51rpx;
+        }
+        input{
+          border:none;
+          border-bottom:2rpx solid #ccc;
+          padding-left: 60rpx;
+        }
+
+      }
+      .box3{
+        display: inline-block;
+        line-height: 120rpx;
+      }
+      .cash-all{
+        line-height: 120rpx;
+        margin-left:20rpx;
+        display: inline-block;
+        color:#049BFF;
+      }
+      .do-cash-disabled{
+        background-color: #ddd;
+        border-radius: 20rpx;
+        font-size: 35rpx;
+        color:#FFF;
+      }
+      .do-cash{
+        border-radius: 20rpx;
+        font-size: 35rpx;
+        background-color: #049BFF;
+        color:#FFF;
+        &:active{
+           opacity: 0.85;
+         }
+      }
+      .cash-date{
+        text-align: center;
+        color:#888;
+        line-height: 80rpx;
+        font-size: 24rpx;
+      }
+    }
+  }
+</style>
+
+
+<template>
+  <view class="cash">
+    <image src="{{userInfo.avatarUrl}}" class="user-image"></image>
+    <view style="" class="cash-box">
+      <view class="box1 clearfix">
+        <view class="cash-sum">赏金总额：</view>
+        <view class="sum-number"><text class="red">{{cash}}</text> 元</view>
+      </view>
+      <view class="tip" wx-if="{{showTip}}">提示：{{tip}}</view>
+      <view class="box2">提现金额：</view>
+      <view class="input-cash">
+        <text class='icon'>￥</text><input type="digit"   @input ="checkValue" @blur="checkResult" value="{{cashValue}}"  placeholder-style="color:#999;font-size:28rpx"  placeholder="填写金额"  maxlength="10" />
+      </view>
+
+      <view class="box3">提现到微信零钱</view>
+      <view class="cash-all" ><text @tap="allCash">全部提现</text></view>
+      <button  class="{{disabled?'do-cash-disabled':'do-cash'}}" disabled="{{disabled}}" @tap="getMoney">提现</button>
+      <view class="cash-date">申请提现后会在1-3个工作日内转账到您的微信钱包</view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  var mta= require('../../static/js/mta_analysis.js')
+  export default class Cash extends wepy.page{
+    config = {
+      navigationBarTitleText: '赏金提现'
+    };
+    components = {};
+
+    data = {
+      userInfo:{},    //存储用户信息
+      tip:"",         //错误提示内容
+      showTip:false, //显示输入提现金额错误提示
+      cashValue:"", //输入的提现的金额
+      cash:"8.00", //现有的余额
+      disabled:true, //判断提现按钮禁用与否
+
+
+    };
+    methods = {
+      checkValue(e){
+        let inputValue = e.detail.value;
+        this.cashValue = inputValue;
+        console.log(this.cashValue);
+        let reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+        if(reg.test(inputValue)){
+         if(parseFloat(inputValue)==0||parseFloat(inputValue)>this.cash){
+            this.disabled = true;
+            console.log("输入金额正确！但是超过余额或者提现金额为0！");
+           console.log("-----------------------------------------------")
+          }else{
+            this.disabled = "";
+            this.showTip = false;
+            console.log("输入金额正确！");
+           console.log("-----------------------------------------------")
+          }
+        }else{
+          console.log("输入金额有误！");
+          this.disabled = true;
+        }
+      },
+      checkResult(e){
+        let inputValue = e.detail.value;
+        let reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+        if(this.disabled){
+          if(parseFloat(inputValue)==0&&reg.test(inputValue)){
+            this.tip = "提现金额不能为0"
+          }else if(parseFloat(inputValue)>this.cash&&reg.test(inputValue)){
+            this.tip = "提现金额超过余额！";
+          }else{
+            this.tip = "输入金额有误或超过两位小数";
+          }
+          this.showTip = true;
+          if(inputValue == ""){
+            this.tip = "";
+            this.showTip = false;
+          }
+        }else{
+          console.log("失去焦点事件：输入金额正确！");
+          this.cashValue = parseFloat(inputValue).toFixed(2);
+          console.log("我是cashValue"+this.cashValue)
+        }
+      },
+      allCash(){
+
+        let value = parseFloat(this.cash);
+        if(value==0){
+          this.disabled = true;
+          wepy.showToast({
+            title: '没有余额',
+            icon: 'loading',
+            duration: 1000
+          })
+        }else{
+
+            console.log("我是全部提现按钮");
+            console.log("cashValue"+this.cashValue);
+            console.log("cash"+this.cash);
+            this.cashValue = this.cash;
+            this.disabled = "";
+            this.showTip = false;
+            this.tip = "";
+
+
+
+
+        }
+      },
+      getMoney(){
+        if(this.disabled){
+          console.log("我被禁用了，点击也没用！")
+        }else{
+          if(parseFloat(this.cashValue)==0){
+            wepy.showToast({
+              title: '提现金额为0',
+              icon: 'loading',
+              duration: 1000
+            })
+          }else{
+            console.log("我被点击了");
+            console.log("我是button"+this.cashValue)
+          }
+
+        }
+
+      }
+    };
+
+    events = {};
+    onLoad() {
+        mta.Page.init();
+        this.userInfo = wepy.getStorageSync("aaa");
+    };
+  }
+</script>

@@ -1,0 +1,243 @@
+<style lang="less">
+  /** less **/
+
+  .share-btn{
+    width:70%;font-size: 35rpx;background-color:#179B16;color:#FFF;
+    &:active{
+      opacity: 0.85;
+    }
+  }
+  .header {
+    margin: 90rpx 0 90rpx 50rpx;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    width: 650rpx;
+    height: 300rpx;
+    line-height: 450rpx;
+    .header-image{
+      width: 200rpx;
+      height: 200rpx;
+      border:1rpx solid #EEE;
+    }
+  }
+  .content {
+    margin-left: 50rpx;
+    margin-bottom: 90rpx;
+    .content-title{
+
+    }
+    .content-tip{
+      display: block;
+      color: #9d9d9d;
+      margin-top: 40rpx;
+      font-size: 28rpx;
+    }
+  }
+  .bottom {
+    border-radius: 80rpx;
+    margin: 70rpx 50rpx;
+    font-size: 35rpx;
+  }
+  .bigImage{
+    width:400rpx;height:400rpx;transition: all 0.3s;
+  }
+  .smallImage{
+    width:340rpx;height:340rpx;
+  }
+
+</style>
+
+<template>
+  <view class="login-bg" wx:if="{{!loginOk}}">
+    <view class='header'>
+      <image src="../static/images/icon.png" class="header-image"></image>
+    </view>
+
+    <view class='content'>
+      <view class="content-title">申请获取以下权限</view>
+      <text class="content-tip">获得你的公开信息(昵称，头像等)</text>
+    </view>
+
+    <button class='bottom' type='primary' open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="bindGetUserInfo">
+      授权登录
+    </button>
+  </view>
+  <view style="width:100%;height:100vh;padding:40rpx 40rpx;box-sizing: border-box;background: linear-gradient(#FFF, #049BFF);" wx:if="{{loginOk&&version}}">
+    <view style="width:100%;line-height: 60rpx;text-indent:2rem;border:10rpx solid #333;border-radius: 30rpx;font-size: 40rpx;color:#FFF;font-weight:600;background-color:#049BFF;text-shadow:4rpx 4rpx 4rpx #333;padding:20rpx;box-sizing: border-box">
+      这是你的专属推广二维码，邀请好友一起来组队刷积分吧！
+    </view>
+    <view style="width:100%;height:500rpx;text-align:center;margin-top:40rpx">
+      <image id="myPic"  src="{{code}}" data-src="{{code}}" alt="" style="width:500rpx;height:500rpx;border:1rpx solid #ccc" @tap="previewImage"></image>
+    </view>
+    <view style="margin-top: 30rpx;color:#555;text-align: center">或点击下面的分享按钮,直接分享给朋友</view>
+    <view style="text-align: center;margin-top: 6px;"><button open-type="share" class="share-btn" @click="countShare">分享给好友</button></view>
+  </view>
+  <view style="width:100%;height:100vh;background-color: #2eb3ff;padding:0 30rpx 30rpx;box-sizing: border-box" wx:if="{{loginOk&&!version}}">
+      <view style=" height:80rpx;line-height: 80rpx;font-size: 44rpx;color:#333;text-align:center;font-weight: bold;">今日新出的【程序试玩中心】</view>
+      <view style="width:50%;height:40%;font-size: 32rpx;">
+        <view>
+          新出，目前市场一片空白，不用下载，直接小程序赚钱，每个
+        </view>
+        <view>
+          红包0.05元
+        </view>
+        <view>
+          0.3元秒提
+        </view>
+        <view>
+          4级分成：
+        </view>
+        <view>
+          <view>一代：0.04</view>
+          <view>二代：0.03</view>
+          <view>三代：0.02</view>
+          <view>四代：0.01</view>
+        </view>
+        <view>
+          看懂的速度占领市场
+        </view>
+        <view>
+          裂变超乎你的想象
+        </view>
+      </view>
+      <view class="clearfix">
+        <view style="color:#fef951;padding:200rpx 60rpx 0 60rpx;box-sizing:border-box;float: left;">
+          <view>白捡的钱</view>
+          <view>速度玩</view>
+          <view>速度推广</view>
+        </view>
+
+
+        <view style="position:relative">
+          <image src="{{code}}" data-src="{{code}}" class="{{bigImage?'bigImage':'smallImage'}}" style="border:1rpx solid #ccc;margin-bottom:-20rpx;float: right;" @tap="previewImage"  onload="imageLoad"></image>
+          <view style="position:absolute;bottom:20rpx;right:60rpx;color:#fff;font-size: 32rpx;">
+            <view>长期0.3元微信</view>
+            <view>提现秒到，秒到</view>
+          </view>
+        </view>
+      </view>
+      <view style="margin-top: 40rpx;"><button style="width:70%" open-type="share" class="share-btn" @click="countShare">分享给好友</button></view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import {$http} from '../static/js/http.js'
+  var mta= require('../static/js/mta_analysis.js')
+  export default class Spread extends wepy.page {
+    config = {
+      navigationBarTitleText: '组队试玩'
+    };
+    components = {};
+    data = {
+      version:1,
+      loginOk:false, //是否登入
+      code:"", //二维码
+      bigImage:false,
+
+    };
+    methods = {
+      //图片加载完成
+      imageLoad(){
+        let device = wepy.getSystemInfoSync();
+        if(device.windowHeight>=600){
+          this.bigImage = true;
+        }
+
+      },
+      //统计点击分享按钮的次数
+      countShare(){
+        mta.Event.stat("shareCode", {"desc":"组队试玩页面，点击分享按钮次数"});
+      },
+      //预览二维码图片
+      previewImage: function (e) {
+        let current = e.target.dataset.src;
+        wepy.previewImage({
+          current: current,
+          urls: [current]
+        });
+      }
+    };
+    events = {};
+    onReady(){
+      this.version = this.$parent.globalData.version;
+      if(wepy.getStorageSync("loginOk")){
+        this.loginOk = true;
+      }
+    }
+    onLoad(){
+      mta.Page.init();
+
+    };
+    onShow(){
+      let that = this;
+      console.log("spread:",this.$parent.globalData.version);
+
+      // var p = getCurrentPages();
+      // var route = p.pop().__route__;
+      // console.log(route)
+      wepy.getSetting({
+        success(res) {
+          if (res.authSetting['scope.userInfo']) {
+            console.log("授权成功");
+            that.loginOk = true;
+            if(wepy.getStorageSync("code")==""){
+              wepy.showToast({
+                title: '加载中...',
+                icon: 'loading'
+              });
+              $http("/wechat_mp/get_code","POST",{scene:`${wepy.getStorageSync("chn_id")}_${wepy.getStorageSync("uid")}`},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+                let myCode =  res.data.data;
+                wepy.setStorage({
+                  key:"code",
+                  data:'data:image/png;base64,'+myCode
+                });
+                that.code ='data:image/png;base64,' + myCode;
+                that.$apply();
+                wepy.hideToast();
+              })
+            }else{
+              console.log("有code了！！")
+              that.code = wepy.getStorageSync("code");
+              that.$apply();
+            }
+          }else{
+            console.log("授权失败");
+            that.loginOk = false;
+          }
+        },
+        fail(res){
+          console.log("setfail")
+        }
+      });
+    }
+    // Other properties
+    onShareAppMessage(){
+      return{
+        title: "[有人@你]跟我一起组队刷积分赚钱吧！",
+        desc:"任务积分派X，超级火爆的小程序",
+        path:"/pages/index?uid="+wepy.getStorageSync("uid"),
+        imageUrl:"http://video.myqiaqia.mobi/web/images/miniShare/share.png",
+        success:function(res){
+          console.log("转发成功！");
+        },
+        fail:function(res){
+          console.log("失败");
+          console.log(res)
+        }
+      }
+    }
+    bindGetUserInfo(e) {
+      let that = this;
+      this.$parent.login(e).then(()=>{
+        that.onShow();
+        that.loginOk = true;
+        that.$apply();
+      });
+    }
+  }
+</script>
+
+
+

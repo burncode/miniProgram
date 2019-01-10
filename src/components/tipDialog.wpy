@@ -1,0 +1,47 @@
+<style type="less">
+
+</style>
+<template>
+  <view class="tip-dialog">
+    <view style="width:100%;height:120vh;background-color: rgba(0,0,0,0.8);z-index: 1000;position: absolute;top:0;left:0;"  catchtouchmove="banMove">
+      <view  style="width:600rpx;margin-left: 50%;position: absolute;left:-300rpx;top:30vh;background-color: #fff;">
+        <view style="color:#fff;background-color: #049BFF;height:60rpx;line-height: 60rpx;padding-left: 30rpx;">温馨提示</view>
+        <view style="padding:15rpx 20rpx;border-bottom:2rpx solid #eee;box-sizing: border-box;font-size: 36rpx;">
+
+          <view style="text-indent: 2rem;text-align: justify">
+            <span class="red" style="font-size:40rpx;font-weight: bold;">邀请好友，获取更多积分。</span>
+          </view>
+
+          <view style="text-indent: 2rem;text-align: justify">
+            好友带来的收益，可以在<span class="red">“我的”</span>--><span class="red">“我的积分”</span>那里进行查看。
+          </view>
+
+        </view>
+        <view style="text-align: center;padding:20rpx 0"><button class="my-btn" @tap="toSpread" style="color:#fff;background-color: #049BFF;width:200rpx;font-size: 32rpx;">确定</button></view>
+      </view>
+    </view>
+
+
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class TipDialog extends wepy.component {
+    props = {
+      redPaper:{
+        type:Number,
+        default:0
+      }
+    };
+    data = {
+    };
+    methods = {
+      banMove(){
+
+      },
+      toSpread(){
+        this.$emit("toSpread")
+      }
+    }
+  }
+</script>

@@ -1,0 +1,44 @@
+<style type="less">
+
+</style>
+<template>
+  <view class="welfare-dialog">
+    <view style="width:100%;height:120vh;background-color: rgba(0,0,0,0.8);z-index: 1000;position: absolute;top:0;left:0;"  catchtouchmove="banMove">
+      <view style="width:600rpx;height:800rpx;margin-left: 50%;position: absolute;top:15vh;left:-300rpx;">
+        <image src="../static/images/red1.png" style="position: absolute;left:0;top:0;width:240rpx;height:340rpx;z-index: -1"></image>
+        <image src="../static/images/red1.png" style="position: absolute;left:60rpx;top:-50repx;width:240rpx;height:340rpx;z-index: -1;transform: rotateZ(180deg)"></image>
+        <image src="../static/images/red2.png" style="position: absolute;right:-20rpx;top:0;width:240rpx;height:240rpx;z-index: -1"></image>
+        <image src="../static/images/red2.png" style="position: absolute;right:120rpx;top:-120rpx;width:240rpx;height:240rpx;transform: rotateX(120deg)"></image>
+
+        <image src="../static/images/hongbao2.png" style="width:100%;height:100%"></image>
+        <view style="width:600rpx;height:400rpx;position:absolute;top:300rpx;left:0;padding:0 100rpx;box-sizing: border-box">
+          <view style="color:#f5b012;font-size: 66rpx;text-align: center">{{redPaper}}积分</view>
+          <view style="color:#f5b012;font-size: 32rpx;margin-top: 80rpx;text-align: justify">试玩积分已存到“<span style="text-decoration: underline;color:#049BFF" @tap="toBalance">我的积分</span>”中</view>
+          <button style="width:60%;height:80rpx;line-height: 80rpx;font-size:32rpx ;background-color: #e23826;border:1rpx solid #f5b012;color:#f5b012;margin-top: 36rpx;" @tap="sure">确定</button>
+        </view>
+      </view>
+    </view>
+
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class RedPaper extends wepy.component {
+    props = {
+      redPaper:{
+        type:Number,
+        default:0
+      }
+    };
+    data = {
+    };
+    methods = {
+      banMove(){
+
+      },
+      sure(){
+        this.$emit("sure")
+      }
+    }
+  }
+</script>

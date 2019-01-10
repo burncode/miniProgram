@@ -1,0 +1,58 @@
+<style type="less">
+
+</style>
+<template>
+  <view class="welfare-dialog">
+    <view style="width:100%;height:120vh;background-color: rgba(0,0,0,0.8);z-index: 1000;position: absolute;top:0;left:0;" catchtouchmove="banMove">
+      <view style="width:600rpx;height:960rpx;margin-left: 50%;position: absolute;top:8vh;left:-300rpx;background-color: #fff;">
+        <view style="color:#fff;background-color: #049BFF;height:60rpx;line-height: 60rpx;padding-left: 30rpx">温馨提示</view>
+        <view style="padding:15rpx;border-bottom:2rpx solid #eee">
+          <view style="border:1rpx solid #eee">
+            <scroll-view scroll-y style="height: 740rpx;padding:15rpx;box-sizing: border-box" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" >
+              <view>
+                <view style="font-weight: bolder;font-size: 36rpx;">第一步：</view>
+                <view style="font-size: 32rpx;text-indent: 2rem">发送“1”给任务积分派客服，如下图所示：</view>
+                <view>
+                  <image src="../static/images/step1.png" alt="" style="width:100%;height:350rpx;box-sizing:border-box;border:2rpx solid #ccc"></image>
+                </view>
+              </view>
+              <view>
+                <view style="font-weight: bolder;font-size: 36rpx;">第二步：</view>
+                <view style="font-size: 32rpx;text-indent: 2rem">第一步骤完成后，会收到任务积分派客服返回的二维码，<span style="color:#DE4C56">点击打开大图长按识别二维码</span>即可，如下图所示：</view>
+                <view>
+                  <image src="../static/images/step2.png" alt="" style="width:100%;box-sizing:border-box;border:2rpx solid #ccc"></image>
+                </view>
+              </view>
+              <view>
+                <view style="font-weight: bolder;font-size: 36rpx;">第三步：</view>
+                <view style="font-size: 32rpx;text-indent: 2rem">第二步骤完成后，进入公众号，在公众号下面点击<span style="color:#DE4C56">“福利群”</span>即可，如下图所示：</view>
+                <view>
+                  <image src="../static/images/get_fuliqun.png" alt="" style="width:100%;height:200rpx;box-sizing:border-box;border:2rpx solid #ccc"></image>
+                </view>
+              </view>
+            </scroll-view>
+          </view>
+        </view>
+        <view style="text-align: center;margin-top: 20rpx;"><button class="my-btn" open-type="contact" bindcontact="handleContact" @tap="fuliCount" style="color:#fff;background-color: #049BFF;width:200rpx;font-size: 32rpx;">确定</button></view>
+      </view>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  export default class WelfareDialog extends wepy.component {
+    props = {
+
+    };
+    data = {
+    };
+    methods = {
+      banMove(){
+
+      },
+      fuliCount(){
+        this.$emit("qunDialogClose");
+      },
+    }
+  }
+</script>

@@ -1,0 +1,265 @@
+<style lang="less">
+
+  .srcoll_view{
+    position: absolute;
+    top:0rpx;
+    height: 60rpx;
+    font-size: 30rpx;
+    white-space: nowrap;
+    line-height: 60rpx;
+    color: #333;
+    animation:myfirst 30s linear infinite;
+
+
+    .show-text{
+      color:#FFF;
+      display: inline-block;
+    }
+
+
+  }
+  @keyframes myfirst
+  {
+    /*0% {translate(100%);}*/
+    /*100% {translate(-100%);}*/
+    0% {
+      margin-left: 100%;
+    }
+    100% {
+      margin-left: -6200rpx;
+    }
+  }
+  .scroll_view_border{
+    position: relative;
+    width: 100%;
+    height: 60rpx;
+    overflow: hidden;
+    background-color: #6fb8ff;
+    border-top:2rpx solid #056ed4;
+    border-bottom:2rpx solid #056ed4;
+  }
+
+  .balance{
+    width:100%;
+    height:100vh;
+    background-color: #F5F5F5;
+    box-sizing:border-box;
+    .user-image{
+    width:170rpx;
+    height:170rpx;
+    border-radius: 50%;
+    border:2rpx solid #fff;
+    position:absolute;
+    margin-left:50%;
+    top: 80rpx;
+    left: -85rpx;
+
+  }
+    .balance-box{
+       width:100%;
+       background-color: #FFF;
+       padding:90rpx 30rpx 40rpx 30rpx;
+       box-sizing: border-box;
+       font-size: 28rpx;
+       border: 1rpx solid #eee;
+       border-top:none;
+
+
+    }
+  }
+  .balance-all{
+    font-size: 32rpx;text-align: center;height:60rpx;line-height: 60rpx;border-bottom:1rpx solid #EEE;
+  }
+  .money-red{
+    color:#DE4C56;margin-right: 6rpx;
+    font-weight:600;
+    font-size:33rpx;
+    display: inline-block;
+  }
+  .branch{
+    color:#888;line-height: 60rpx;
+
+  }
+  .balance-all{
+    height:60rpx;
+    line-height: 60rpx;
+  }
+  .branch-line1{
+    width:200rpx;height:50rpx;border-left:1rpx dashed #ccc;border-bottom:1rpx dashed #ccc;margin-left: 50rpx;position: relative;
+    .level1{
+      width:400rpx;padding-left:20rpx;background-color: #FFF;position: absolute;top:25rpx;left:100rpx;
+    }
+  }
+  .branch-line2{
+    width:200rpx;height:50rpx;border-left:1rpx dashed #ccc;border-bottom:1rpx dashed #ccc;margin-left: 100rpx;position: relative;
+    .level2{
+      width:400rpx;padding-left:20rpx;background-color: #FFF;position: absolute;top:25rpx;left:100rpx;
+    }
+  }
+  .cash{
+    margin-top: 10rpx;background-color: #049BFF;color:#F1F1F1;
+  }
+  .detail{
+    margin-top: 40rpx;text-align: center;color:#049BFF;text-decoration:underline;
+  }
+  .invite-friend{
+    height:60rpx;
+    line-height:60rpx;
+  }
+  .friend-invite-friend{
+    height:60rpx;
+    line-height:60rpx;
+  }
+</style>
+
+
+<template>
+  <view class="balance">
+    <view class='scroll_view_border'>
+      <view class="srcoll_view" ><image style="width:30rpx;height:30rpx;vertical-align: middle;line-height: 30rpx;margin-bottom: 10rpx;margin-right: 20rpx;" src="../../static/images/laba.png"></image><text wx:for="{{textList}}" wx:key="{{index}}" class="show-text" >“{{item.name}}”邀请了{{item.count}}个好友，累计获得<text class="money-red">{{item.balance}}</text>积分<text style="width:100rpx;display: inline-block"></text></text></view>
+    </view>
+
+    <view style="padding:0 30rpx">
+      <image src="{{userInfo.avatarUrl}}" class="user-image"></image>
+      <view style="width:100%;height:500rpx;background-color:#049BFF;padding:60rpx 0;box-sizing: border-box;margin-top: 66rpx;border-radius:80rpx;border-top:4rpx solid #056ed4">
+        <view class="balance-box">
+          <view class="balance-all">我的总积分：<text class="money-red">{{user.base_money}}</text>积分</view>
+
+          <view class="branch">邀请好友数量：</view>
+          <view class="invite-friend">已邀请好友：<span class="money-red" style="font-size: 36rpx;">{{layerFirst}}</span></view>
+          <view class="friend-invite-friend">好友邀请好友：<span class="money-red" style="font-size: 36rpx;">{{layerSum}}</span></view>
+          <view class="branch">我的积分详情：</view>
+          <view class="branch-all">总积分</view>
+          <view class="branch-line1" style="margin-top: 12rpx">
+            <view class="level1">任务积分：<span class="money-red" style="font-size: 36rpx;">{{taskSum}}</span></view>
+          </view>
+          <view class="branch-line1">
+            <view class="level1">推广积分：<span class="money-red" style="font-size: 36rpx;">{{shareSum}}</span></view>
+          </view>
+          <view class="detail" @tap="toDetail">查看更多积分明细>></view>
+          <button  class="cash my-btn" @tap="toCash">立即兑换</button>
+          <view class="theme-color" style="margin-top: 10rpx;text-align: center;" @tap="reload">刷新页面</view>
+        </view>
+      </view>
+    </view>
+
+  </view>
+
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import {$http} from '../../static/js/http.js'
+  var mta= require('../../static/js/mta_analysis.js')
+  export default class Balance extends wepy.page{
+    config = {
+      navigationBarTitleText: '我的收益',
+    };
+    components = {};
+
+    data = {
+      layerFirst:0,
+      layerSum:0,
+      userBalance:{},
+      userInfo:{},
+      taskSum:0,
+      taskTimes:0,
+      shareSum:0,
+      shareTimes:0,
+      textList:[
+        {
+          name:"Areyen",count:"642",balance:"811.66"
+        },
+        {
+          name:"飞虎大隊长",count:"479",balance:"513.36"
+        },
+        {
+          name:"夏末吃泡面",count:"491",balance:"1297.85"
+        },
+        {
+          name:"超皮皮皮卡丘",count:"1152",balance:"16673.32"
+        },
+        {
+          name:"冬天与夏天",count:"451",balance:"3085.58"
+        },
+        {
+          name:"萧炎吹笛",count:"971",balance:"14358.55"
+        },
+        {
+          name:"玛丽闯乌龙",count:"667",balance:"2455.24"
+        },
+        {
+          name:"凤羽",count:"981",balance:"4535.00"
+        },
+//        {
+//          name:"离歌",count:"421",balance:"3014"
+//        },
+//        {
+//          name:"小车西西",count:"1244",balance:"12460"
+//        },
+//        {
+//          name:"猫吃鱼",count:"871",balance:"7878"
+//        },
+      ],
+      user:{
+        base_money:0
+      }
+    };
+    methods = {
+      reload(){
+        this.onShow();
+      },
+      toCash(){
+        wepy.navigateTo({
+          url:'./exchange'
+        })
+      },
+      toDetail(){
+        wepy.navigateTo({
+          url:`./detail?taskSum=${this.taskSum}&taskTimes=${this.taskTimes}&shareSum=${this.shareSum}&shareTimes=${this.shareTimes}`
+        })
+      }
+    };
+
+    events = {};
+    onLoad(){
+      mta.Page.init();
+      if(wepy.getStorageSync("updateUserInfo")){
+        this.userInfo = wepy.getStorageSync("updateUserInfo");
+      }else{
+        this.userInfo = wepy.getStorageSync("user");
+      }
+      this.$apply();
+    }
+    onShow() {
+      let that = this;
+      this.$parent.showLoading("数据加载中",50000,true);
+      $http("/get_user_info","POST",{},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+        let myUser = res.data.user;
+        that.user = myUser;
+        $http("/get_next_user_info","POST",{layer:4},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+          let layer = res.data.data_map_count;
+          that.layerSum = layer['l2']+layer['l3']+layer['l4'];
+          that.layerFirst = layer['l1'];
+          that.$apply();
+        });
+      });
+      $http("/trade/get_trade_log_stat","POST",{begin_time:"2018-07-04 00:00:00",type:2},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+        that.taskSum = res.data.trade_log_stat.sum_base_money;
+        that.taskTimes = res.data.trade_log_stat.count;
+        $http("/trade/get_trade_log_stat","POST",{begin_time:"2018-07-04 00:00:00",type:3},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},function(res){
+          that.shareSum = res.data.trade_log_stat.sum_base_money;
+          that.shareTimes = res.data.trade_log_stat.count;
+          wepy.hideToast();
+          that.$apply();
+          that.$parent.hideLoading();
+        });
+      });
+      this.$apply();
+    };
+
+
+
+
+  }
+</script>

@@ -1,0 +1,64 @@
+<style lang="less">
+
+</style>
+<template>
+  <view class="group" style="padding:50rpx 20rpx 0 20rpx">
+    <view style="border:6rpx solid #333;padding:60rpx 20rpx 0 20rpx;position: relative">
+      <view style="width:230rpx;height:80rpx;text-align:center;position:absolute;top:-40rpx;left:20rpx;background-color: #fff;">
+        <image src="../../static/images/fuliqun.png" style="width:200rpx;height:80rpx;"></image>
+      </view>
+      <view style="font-size: 50rpx;font-weight: bolder;margin-bottom: 20rpx;text-shadow: 2rpx 4rpx 2rpx #666;">
+        第一步：
+      </view>
+      <view style="width:100%;height:260rpx">
+        <view style="border:2rpx solid #eee;border-radius: 6rpx;position:relative">
+
+          <image src="../../static/images/group_arrow.png" style="width:100rpx;height:100rpx;position:absolute;right:70rpx;bottom:-70rpx;z-index:1000;"></image>
+          <view style="font-size: 30rpx;position:absolute;right:180rpx;bottom:-70rpx;font-weight: bold;">点击这里<span style="color:#DE4C56;">关注公众号</span></view>
+          <official-account bindload="follow" binderror="followError">
+          </official-account>
+        </view>
+      </view>
+
+      <view style="font-size: 50rpx;font-weight: bolder;margin-bottom: 20rpx;text-shadow: 2rpx 4rpx 2rpx #666;">
+        第二步：
+      </view>
+      <view style="font-size: 32rpx;">
+        点击“第一步”中“查看”按钮查看公众号，再点击进入“进入公众号”即可。如下图所示：
+      </view>
+      <view style="text-align: center;position:relative;margin-top: 16rpx;">
+        <image src="../../static/images/group_step2.jpg" style="width:90%;height:400rpx;border:2rpx solid #eee"></image>
+      </view>
+
+      <view style="font-size: 50rpx;font-weight: bolder;margin-bottom: 20rpx;text-shadow: 2rpx 4rpx 2rpx #666;">
+        第三步：
+      </view>
+      <view style="font-size: 32rpx;">
+        进入公众号后，点击进入公众号下面的“福利群”即获取公众号提供的福利群二维码。如下图所示：
+      </view>
+      <view style="text-align: center;position:relative;margin-top: 16rpx;">
+        <image src="../../static/images/get_fuliqun.png" style="width:90%;height:200rpx;border:2rpx solid #eee"></image>
+      </view>
+    </view>
+
+
+  </view>
+</template>
+<script>
+  import wepy from 'wepy';
+  var mta= require('../../static/js/mta_analysis.js')
+  export default class Group extends wepy.page {
+    config = {
+      navigationBarTitleText: '福利群'
+    };
+    data = {
+
+    };
+    methods = {
+
+    };
+    onLoad(){
+      mta.Page.init();
+    }
+  }
+</script>

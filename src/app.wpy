@@ -1,0 +1,194 @@
+<style lang="less" >
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+.clearfix:after{
+  content:"";
+  height:0;
+  line-height:0;
+  display:block;
+  clear:both;
+  visibility:hidden;
+}
+.no-border::after{ border: none; }
+.theme-bg-color{
+  background-color: #049BFF;
+}
+.theme-color{
+  color:#049BFF
+}
+.red{
+  color:#DE4C56;
+}
+.my-btn{
+  background-color:#049BFF;color:#f1f1f1;box-shadow:1rpx 1rpx 2rpx #333;
+  &:active{
+    box-shadow:1rpx 1rpx 2rpx #333 inset;
+  }
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+import userLogin from './static/js/login'
+var mta= require('./static/js/mta_analysis.js');
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/index',
+      'pages/spread',
+      'pages/user',
+      'pages/user/login',
+      'pages/user/balance',
+      'pages/user/group',
+      'pages/user/detail',
+      'pages/user/cash',
+      'pages/user/advice',
+      'pages/user/exchange',
+      'pages/user/gift',
+      'pages/task/task',
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#049BFF',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: '#FFFFFF'
+    },
+    tabBar: {
+      color: '#AEADAD',
+      selectedColor: '#049BFF',
+      backgroundColor: '#fff',
+      borderStyle: 'black',
+      list: [
+        {
+          pagePath: 'pages/index',
+          iconPath:  './static/images/tabbar/1.png',
+          selectedIconPath: './static/images/tabbar/1s.png',
+          text: '首页'
+        },
+        {
+          pagePath: 'pages/spread',
+          iconPath:  './static/images/tabbar/2.png',
+          selectedIconPath:  './static/images/tabbar/2s.png',
+          text: '组队试玩'
+        },
+        {
+          pagePath: 'pages/user',
+          iconPath:  './static/images/tabbar/3.png',
+          selectedIconPath:  './static/images/tabbar/3s.png',
+          text: '我的'
+        }
+      ]
+    },
+    //配置跳转小程序appid
+    navigateToMiniProgramAppIdList:["wxa344448166586158","wx48b3b26e45ad2e2e","wxb29884a8126c78ac","wxd9d86cea4b6d4265", "wx36c97194f269284e"],
+  }
+
+  globalData = {
+    version:1,
+    userInfo: null,
+    token:"",
+    officialAccount:false,
+  }
+
+  constructor () {
+    super();
+    this.use('requestfix');
+  }
+  onReady(options){
+
+  }
+  onLaunch(options) {
+    if(options.scene===1011||options.scene===1047){
+      this.globalData.officialAccount = true;
+    }else{
+      this.globalData.officialAccount = false;
+    }
+    //小程序统计配置
+    mta.App.init({
+      "appID":"500654943",
+      "eventID":"500656708", // 高级功能-自定义事件统计ID，配置开通后在初始化处填写
+      "lauchOpts":options, //渠道分析,需在onLaunch方法传入options,如onLaunch:function(options){...}
+      "statPullDownFresh":true, // 使用分析-下拉刷新次数/人数，必须先开通自定义事件，并配置了合法的eventID
+      "statShareApp":true, // 使用分析-分享次数/人数，必须先开通自定义事件，并配置了合法的eventID
+      "statReachBottom":true // 使用分析-页面触底次数/人数，必须先开通自定义事件，并配置了合法的eventID
+    });
+  }
+  onLoad(){
+
+  }
+  onShow(){
+
+  }
+  //检测版本并更新版本
+  updateVersion(){
+    // wx.getUpdateManager 在 1.9.90 才可用，请注意兼容
+    const updateManager = wx.getUpdateManager();
+    updateManager.onCheckForUpdate(function (res) {
+      // 请求完新版本信息的回调
+      console.log("请求完新版本信息的回调hasUpdate：",res.hasUpdate);
+    });
+    updateManager.onUpdateReady(function () {
+      // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+      this.showDialog("更新提示","新版本已经准备好，是否马上重启小程序","好的",false).then(()=>{
+        updateManager.applyUpdate();
+      });
+    });
+    updateManager.onUpdateFailed(function () {
+      // 新的版本下载失败
+    });
+  }
+  showLoading(text,time,mask=true){
+    wepy.showToast({
+      title: text,
+      icon: 'loading',
+      duration: time,
+      mask: mask,
+    });
+  }
+  hideLoading(){
+    wepy.hideToast();
+  }
+  showDialog(title,content,confirmText,showCancel){
+    return new Promise((resolve,reject)=>{
+      wepy.showModal({
+        title,
+        content,
+        confirmText,
+        showCancel,
+        success(res){
+          if (res.confirm) {
+            resolve();
+          }
+        }
+      })
+    })
+
+  }
+  //登入
+  login(e){
+    return new Promise(((resolve,reject)=>{
+      wepy.setStorageSync("user", e.detail.userInfo);
+      //用户点击登入按钮，触发按钮中open-type 对应 bindgetuserinfo绑定的事件
+      //用户点击允许授权按钮，用户允许授权则返回的对象e包含用户信息(e.detail.userInfo),拒绝则返回的对象e不含用户信息
+      if (e.detail.userInfo){
+        userLogin(e,function(){
+          resolve();
+        });
+      }
+      //用户按了拒绝按钮
+      else {
+        this.showDialog("温馨提示","您点击了拒绝授权，将无法使用小程序，请授权后再进入!","好的",false)
+      }
+    }));
+
+
+  }
+}
+</script>

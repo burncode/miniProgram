@@ -1,0 +1,295 @@
+<style lang="less">
+  /** less **/
+  .detail{
+    width:100%;height:100vh;background-color: #eee;
+    .detail-top-bg{
+      width:100%;height:80rpx;line-height: 80rpx;font-size: 32rpx;text-align: center;box-sizing:border-box;background-color: #049BFF;color:#FFF;
+      .detail-top{
+        width:50%;height:80rpx;line-height: 60rpx;float: left;
+      }
+    }
+    .swiper{
+      width:100%;height:1200rpx;
+      .swiper-bg{
+        width: 100%;height:1200rpx;background-color: #eee;padding:40rpx;box-sizing:border-box;
+      }
+      .list-top{
+        width:100%;height:80rpx;line-height: 80rpx;background-color:  #049BFF;color:#FFF;padding:0 20rpx;box-sizing: border-box;font-size: 34rpx;font-weight: 600;
+        .list-top-icon{
+          width:40rpx;height:40rpx;vertical-align: middle;margin-right: 10rpx;margin-bottom:8rpx;
+        }
+      }
+      .list-content{
+        width: 100%;height:100%;background-color: #fff;box-shadow:0 4rpx 4rpx #ccc;padding:10rpx 30rpx 20rpx;box-sizing: border-box;
+      }
+    }
+  }
+  .list-tip{
+    line-height: 80rpx;font-size: 32rpx;color:#333;border-bottom: 2rpx solid #eee;
+    .list-tip-task{
+      color:#049BFF;
+    }
+    .list-tip-balance{
+      color:#DE4C56;
+    }
+  }
+  .list-detail{
+    color:#333;font-size: 32rpx;line-height: 74rpx;text-align: center;
+    font-weight:bold;
+  }
+  .swiper-size{
+    width:100%;height:660rpx;border:1rpx solid #eee;padding:10rpx;box-sizing: border-box;
+    .swiper-content{
+      width:100%;height:640rpx;
+      .swiper-item{
+        width:100%;font-size:30rpx;padding: 10rpx 0;
+        .task-time{
+          font-size: 28rpx;color:#888;
+        }
+      }
+    }
+  }
+  .typeActive{
+    padding: 8rpx;
+    border-bottom: 4rpx solid #FFF;
+    opacity: 0.85;
+  }
+  .on{
+    transform: rotate(180deg);
+  }
+  .selected{
+    background-color: #049BFF;
+    color:#FFF;
+  }
+  .noData{
+    width:100%;height:640rpx;line-height:640rpx;text-align:center;font-size: 38rpx;font-weight: bold;color:#333;border:1rpx solid #eee;
+  }
+  .reload{
+    font-size: 28rpx;padding:2rpx;
+  }
+
+  .reloadOk{
+   color:#049BFF;border-bottom: 1rpx solid #049BFF;
+  }
+  .reloadFail{
+   color:#ccc;border-bottom: 1rpx solid #ccc;
+  }
+</style>
+<template>
+  <view class="detail">
+    <view class="detail-top-bg">
+      <view class="detail-top" @tap="toType"  data-current="0"><text class="{{currentTab==0?'typeActive':''}}">任务积分</text></view>
+      <view class="detail-top" @tap="toType"  data-current="1"><text class="{{currentTab==1?'typeActive':''}}">推广积分</text></view>
+    </view>
+    <swiper class="swiper" current="{{currentTab}}" duration="300" bindchange="swiperTab">
+      <swiper-item>
+        <view class="swiper-bg">
+        <view class="list-top"><image class="list-top-icon" src="../../static/images/task.png"></image>任务积分</view>
+        <view class="list-content">
+          <view>
+            <view class="list-tip">您已完成<span class="list-tip-task">{{taskTimes}}</span>个任务！共获得<span class="list-tip-balance">{{taskSum}}积分</span>。</view>
+            <view class="list-detail">任务积分明细</view>
+            <view wx:if="{{noTask}}"  class="noData">
+              <p>暂无数据...<span class="reload {{reloadTimes>=3?'reloadFail':'reloadOk'}}" @tap="reload">刷新页面重试</span></p>
+            </view>
+            <view class="swiper-size"  wx:if="{{!noTask}}" >
+              <scroll-view scroll-y class="swiper-content" @scrolltolower="loadingMore1">
+                <view class="swiper-item" wx:for="{{taskList}}" wx:key="unique">
+                  <view class="task-time">{{item.create_time}}</view>
+                  <view style="width:100%;border-bottom:1rpx solid #f1f1f1;">{{index+1}}.完成{{item.extra_info.desc}}任务获得<span style="color:#DE4C56">{{item.extra_info.base_money}}积分</span></view>
+                </view>
+                <view hidden="{{!taskLoading}}" style="color:#CCC;font-size:30rpx;text-align:center;">正在载入更多...</view>
+                <view hidden="{{!taskLoadingComplete}}" style="color:#CCC;font-size:30rpx;text-align:center;margin-top: 8rpx;">已加载全部</view>
+              </scroll-view>
+            </view>
+          </view>
+        </view>
+      </view>
+      </swiper-item>
+      <swiper-item>
+        <view class="swiper-bg">
+          <view class="list-top"><image class="list-top-icon" src="../../static/images/invite.png" style="width:50rpx;height:50rpx"></image>推广积分</view>
+          <view class="list-content">
+            <view class="list-tip" style="line-height: 50rpx;">你通过努力推广共获得<span class="list-tip-balance">{{shareSum}}积分</span>。</view>
+            <view>
+              <view class="list-detail">推广积分明细</view>
+              <view wx:if="{{noShare}}"  class="noData">
+                <p>暂无数据...<span class="reload {{reloadTimes>=3?'reloadFail':'reloadOk'}}" @tap="reload">刷新页面重试</span></p>
+              </view>
+              <view class="swiper-size" wx:if="{{!noShare}}">
+                <scroll-view scroll-y class="swiper-content" @scrolltolower="loadingMore2">
+                  <view class="swiper-item" wx:for="{{shareList}}" wx:key="unique">
+                    <view class="task-time">{{item.create_time}}</view>
+                    <view>{{index+1}}.{{item.extra_info.rel_nickname}}完成{{item.extra_info.desc}}任务你获得<span style="color:#DE4C56">{{item.extra_info.base_money}}积分</span></view>
+                  </view>
+                  <view hidden="{{!shareLoading}}" style="color:#CCC;font-size:30rpx;text-align:center;">正在载入更多...</view>
+                  <view hidden="{{!shareLoadingComplete}}" style="color:#CCC;font-size:30rpx;text-align:center;margin-top: 8rpx;">已加载全部</view>
+                </scroll-view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import {$http} from '../../static/js/http.js'
+  var mta= require('../../static/js/mta_analysis.js')
+  export default class detail extends wepy.page {
+    config = {
+      navigationBarTitleText: '个人积分明细'
+    };
+    components = {};
+
+    data = {
+      taskTimes:0,  //任务次数
+      taskSum:0, //任务积分
+      shareTimes:0, //推广次数
+      shareSum:0, //推广积分
+      taskList:[], //任务收益列表
+      shareList:[], //推广收益列表
+      currentTab:0,  // 当前选项卡
+      taskLoading:false, //任务加载中标志
+      taskLoadingComplete:false, //任务加载完成标志
+      shareLoading:false, //推广加载完成标志
+      shareLoadingComplete:false, //推广加载完成标志
+      noTask:true,
+      noShare:true,
+      query:"",
+      loadingCount:1, //下拉加载的数据数量
+      typeList:[
+        {
+          name:"任务积分"
+        },
+        {
+          name:"推广积分"
+        }
+      ],   //选项卡标题
+      taskPage:1,
+      sharePage:1,
+      reloadTimes:0,
+      isClick:true,
+    };
+    methods = {
+      //选项卡点击事件
+      toType(e){
+        if(this.currentTab===e.currentTarget.dataset.current){
+          return false;
+        }else {
+          this.currentTab = e.currentTarget.dataset.current;
+        }
+      },
+      swiperTab(e){
+        if(this.currentTab===e.detail.current){
+          return false;
+        }else {
+          this.currentTab = e.detail.current;
+        }
+      },
+      //任务收益列表下拉事件
+      loadingMore1(){
+        this.taskLoading = true;
+        if(this.taskList.length<this.taskTimes){
+          this.getTaskTradeLog();
+        }
+        if(this.taskList.length>=this.taskTimes){
+          this.taskLoading = false;
+          this.taskLoadingComplete = true;
+        }
+        this.$apply();
+      },
+      //推广收益列表下拉事件
+      loadingMore2(){
+        this.shareLoading = true;
+        if(this.shareList.length<this.shareTimes){
+          this.getShareTradeLog();
+        }
+        if(this.taskList.length>=this.taskTimes){
+          this.shareLoading = false;
+          this.shareLoadingComplete = true;
+        }
+        this.$apply();
+      },
+      //刷新页面
+      reload(){
+        if(this.isClick){
+          this.isClick = false;
+          if(this.reloadTimes>=3){
+            this.$parent.showLoading("服务器繁忙...",3000,true);
+            setTimeout(()=>{
+              this.$parent.hideLoading();
+            },3000)
+          }else{
+            this.reloadTimes++;
+            this.initData();// 初始化数据
+            this.onLoad(this.query);
+          }
+          setTimeout(()=>{
+            this.isClick = true;
+          },600)
+        }else{
+          console.log("点太快了~！")
+        }
+      }
+    };
+    onLoad(query) {
+      mta.Page.init();
+      this.getTaskTradeLog();
+      this.getShareTradeLog();
+      this.query = query; //存储积分页面传过来的参数
+      this.taskSum = query.taskSum;  //任务积分
+      this.taskTimes = query.taskTimes; //任务次数
+      this.shareSum = query.shareSum; //分享积分
+      this.shareTimes = query.shareTimes; //分享次数
+      this.$apply();
+    };
+
+    // Other properties
+    //刷新页面时初始化数据
+    initData(){
+        this.taskList=[]; //任务收益列表
+        this.shareList=[]; //推广收益列表
+        this.taskLoading=false; //任务加载中标志
+        this.taskLoadingComplete=false; //任务加载完成标志
+        this.shareLoading=false; //推广加载完成标志
+        this.shareLoadingComplete=false; //推广加载完成标志
+        this.noTask=true;
+        this.noShare=true;
+        this.taskPage=1;
+        this.sharePage=1;
+    };
+    //获取所有积分列表，type2为任务积分，type3为推广积分
+    getTaskTradeLog(){
+      $http("/trade/get_trade_log_list","POST",{page:this.taskPage,begin_time:"2018-05-01 00:00:00",type:2},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},(res)=>{
+        this.taskPage++;
+        this.taskList = this.taskList.concat(res.data.trade_log_list);
+        if(this.taskList.length === 0){
+          this.noTask = true;
+        }else{
+          this.noTask = false;
+        }
+        this.$apply();
+      });
+    }
+    getShareTradeLog(){
+      $http("/trade/get_trade_log_list","POST",{page:this.sharePage,begin_time:"2018-05-01 00:00:00",type:3},{Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},(res)=>{
+        this.sharePage++;
+        this.shareList = this.shareList.concat(res.data.trade_log_list);
+        if(this.shareList.length === 0){
+          this.noShare = true;
+        }else{
+          this.noShare = false;
+        }
+        this.$apply();
+      });
+
+    }
+  }
+</script>
+
+
+

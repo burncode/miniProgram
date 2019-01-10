@@ -1,0 +1,330 @@
+
+<style lang="less">
+  /*变量*/
+  @totalW:100%;
+  @totalH:100%;
+  @pad20: 20rpx;
+
+
+  .boxSizing{
+    box-sizing: border-box;
+  }
+  .totalWH{
+    width:@totalW;
+    height:@totalH;
+  }
+  .fl{
+    float: left;
+  }
+  .fr{
+    float: right;
+  }
+
+  .user{
+    .totalWH();
+    .user-box{
+      width:@totalW;
+      height:230rpx;
+      background-color: #FAFAFA;
+      padding:@pad20+20rpx;
+      border-top:2rpx solid #EEE;
+      border-bottom:2rpx solid #EEE;
+      .user-image{
+        width:180rpx;
+        height:180rpx;
+        border:1rpx solid #ddd;
+        border-radius:50%;
+        .fl();
+        .boxSizing();
+      }
+      .user-login{
+        margin:60rpx 30rpx;
+        font-size:28rpx;
+        color:#FFF;
+        background-color: #049BFF;
+        border:1rpx solid #ddd;
+        float: left;
+      }
+      .user-name{
+        margin:72rpx 30rpx;
+        font-size:28rpx;
+        color:#333;
+        float: left;
+      }
+    }
+    .menu-box{
+      width:@totalW;
+      height:800rpx;
+      background-color: #EEE;
+      padding-top:20rpx;
+      .menu{
+        width:@totalW;
+        padding-bottom:20rpx;
+        background-color: #FFF;
+        .menu-item{
+          width:33%;
+          height:180rpx;
+          border-bottom:1rpx solid #f1f1f1;
+          .fl();
+          .boxSizing();
+          &:nth-child(3n-1){
+            width:34%;
+            border-left:1rpx solid #f1f1f1;
+            border-right:1rpx solid #f1f1f1;
+           }
+          .content{
+            background-color: #fff;
+            padding-top:30rpx;
+            &::after{
+               border: none;
+               outline: none;
+             }
+            .totalWH();
+            .pic{
+              display:flex;
+              justify-content:center;
+              image{
+                width:50rpx;
+                height:50rpx;
+              }
+            }
+            .title{
+              text-align:center;
+              font-size:26rpx;
+              margin-top: 12rpx;
+            }
+          }
+        }
+      }
+      .exit{
+        width:@totalW;
+        height:80rpx;
+        line-height:80rpx;
+        background-color: #FFF;
+        margin-top:20rpx;
+        border:1rpx solid #EEE;
+        border-radius:20rpx;
+        &:active{
+            border:2rpx solid #049BFF;
+            background-color: #f1f1f1;
+         }
+      }
+    }
+  }
+</style>
+
+<template>
+  <view class="user">
+    <view class="user-box">
+      <image class="user-image" src="{{ userInfo.avatarUrl }}"></image>
+      <button class="user-login"  open-type="getUserInfo"  bindgetuserinfo="bindGetUserInfo" wx:if="{{!loginOk}}">登入/注册</button>
+      <view  class="user-name" wx:if="{{loginOk}}">欢迎您，{{userInfo.nickName}}</view>
+    </view>
+
+
+
+    <view class="menu-box">
+      <view class="menu clearfix">
+        <view class="menu-item" wx:for="{{menuList}}" wx:key="{{item.id}}" wx:for-index="myIndex" data-index="{{index}}" wx:if="{{loginOk}}">
+          <button class="content" open-type="{{item.type}}" @tap="toMenu({{myIndex}})">
+            <view  class="pic"><image src="{{item.pic}}"></image></view>
+            <view class="title">{{item.title}}</view>
+          </button>
+        </view>
+
+
+
+        <view class="menu-item" wx:for="{{menuList}}" wx:key="{{item.id}}" wx:for-index="myIndex" data-index="{{index}}" wx:if="{{!loginOk}}">
+          <button class="content" open-type="getUserInfo"  bindgetuserinfo="bindGetUserInfo" >
+            <view  class="pic"><image src="{{item.pic}}"></image></view>
+            <view class="title">{{item.title}}</view>
+          </button>
+        </view>
+
+
+        <view class="menu-item">
+          <button class="content"  @tap="toMenu(100)">
+            <view  class="pic"><image src="../static/images/userMenu/more.png"></image></view>
+            <view class="title">敬请期待</view>
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import {jsonlint} from '../static/js/jsonlint.js'
+  var mta= require('../static/js/mta_analysis.js')
+  export default class User extends wepy.page {
+    config = {
+      navigationBarTitleText:'个人中心'
+    };
+    components = {};
+
+    data = {
+      userInfo:null,
+      loginOk:false,
+      menuList:[
+        {
+          id:1,pic:"../static/images/userMenu/money.png",title:"我的积分",type:""
+        },
+        {
+          id:2,pic:"../static/images/userMenu/cash.png",title:"兑换礼品",type:""
+        },
+        {
+          id:3,pic:"../static/images/userMenu/invite.png",title:"分享好友",type:"share"
+        },
+        {
+          id:4,pic:"../static/images/userMenu/feedBack.png",title:"帮助反馈",type:""
+        },
+      ],
+      preloadData:{
+        name:"hello",
+        age: 12
+      }
+
+
+    };
+    methods = {
+
+
+
+      toMenu(index){
+        switch(index){
+          case 0:
+                 wepy.navigateTo({
+                   url:'/pages/user/balance'
+                 });
+                 break;
+          case 1:
+                 wepy.navigateTo({
+                   url:'/pages/user/exchange'
+                 });
+                break;
+          case 2:
+                mta.Event.stat("shareMini", {"desc":"分享好友"})
+                break;
+          case 3:
+                wepy.navigateTo({
+                  url:'/pages/user/advice'
+                });
+                break;
+          default: console.log("default");break;
+        }
+      }
+    };
+
+    events = {};
+    onReady(){
+      if(wepy.getStorageSync("loginOk")){
+        this.loginOk = true;
+      }
+    }
+    onLoad() {
+      mta.Page.init()
+    };
+    onShow(){
+      let that = this;
+      wepy.getSetting({
+        success(res) {
+          console.log("setSuccess")
+          if (res.authSetting['scope.userInfo']) {
+            if(!wepy.getStorageSync("uid")){
+              wepy.request({
+                url:"https://ps.gzguru.com/get_user_info",
+                method:"POST",
+                dataType:"text",
+                data:{},
+                header:{'content-type': 'text/plain',Appid: "grtaskwall","Cookie": wepy.getStorageSync("third_Session")},
+                responseType :'text',
+                success(res){
+                  let obj = jsonlint.parse(res.data);
+                  console.log(obj)
+                  wepy.setStorageSync("uid",obj.user.uid);
+                }
+              });
+            }
+            console.log("授权成功")
+            that.loginOk = true;
+            wepy.getUserInfo({
+              success: function(res) {
+                wepy.setStorageSync("updateUserInfo", JSON.parse(res.rawData));
+                that.userInfo = wepy.getStorageSync("updateUserInfo");
+                that.$apply();
+              }
+            })
+            that.$apply();
+          }else{
+            console.log("授权失败")
+            that.loginOk = false;
+          }
+        },
+        fail(res){
+          console.log("setfail")
+          that.loginOk = false;
+        }
+      });
+      wepy.checkSession({
+        success(res){
+          console.log("有登入太")
+        },
+        fail(){
+          console.log("没有登入太")
+        }
+      })
+    }
+
+    // Other properties
+
+    shareApp(){
+
+    }
+    onShareAppMessage(){
+      return{
+        title:"[有人@你]跟我一起体验小程序赚钱吧！",
+        desc:"任务积分X，超级火爆的小程序",
+        path:"/pages/index?uid="+wepy.getStorageSync("uid")+"&_mta_ref_id=channel_id",
+        imageUrl:"http://video.myqiaqia.mobi/web/images/miniShare/share.png",
+        success:function(res){
+          console.log("转发成功！")
+        },
+        fail:function(res){
+          console.log("失败");
+          console.log(res)
+        }
+      }
+    }
+
+    showLoginTip(){
+      wepy.showModal({
+        title:'温馨提示',
+        content:'该功能需要登入才可以使用，您尚未登入，请点击确定跳转到登入页面进行登入',
+        success(res){
+          console.log(res);
+          if (res.confirm) {
+            wepy.navigateTo({
+              url: './user/login'
+            })
+          }else{
+            this.loginOk = false;
+          }
+        }
+      })
+    }
+
+    bindGetUserInfo(e) {
+      let that = this;
+      this.$parent.login(e).then(()=>{
+        that.onShow();
+        that.loginOk = true;
+        that.$apply();
+      });
+    }
+  }
+</script>
+
+
+

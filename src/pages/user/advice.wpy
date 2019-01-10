@@ -1,0 +1,134 @@
+<style lang="less">
+  @totalW:100%;
+  .boxSizing{
+    box-sizing: border-box;
+  }
+
+  .advice{
+    width:@totalW;
+    height:1300rpx;
+    background-color: #F1F1F1;
+    .type{
+      width:@totalW;
+      height:60rpx;
+      line-height:60rpx;
+      font-size:28rpx;
+      color:#888;
+      background-color: #FFF;
+      margin-bottom:20rpx;
+      padding-left:34rpx;
+      .boxSizing();
+    }
+    .advice-box{
+      padding:0 30rpx;
+      .boxSizing();
+      .advice-item{
+        width:@totalW;background-color: #fff;padding:0 30rpx;margin-bottom: 30rpx;font-size: 28rpx; .boxSizing();
+        .question{
+          width:@totalW;height:100rpx;line-height: 100rpx;
+          .title{
+            width:92%;display: inline-block;
+          }
+          .icon{
+            width:40rpx; height:40rpx;vertical-align: middle;
+            transition: all 0.3s;
+            &.on{
+               transform: rotate(180deg);
+             }
+          }
+        }
+        .answer{
+          width:@totalW; .boxSizing();
+          .answer-content{
+            width:@totalW;line-height: 46rpx;border-top:2rpx solid #eee; white-space:normal;word-break:break-all;word-wrap:break-word;padding:10rpx 0 20rpx; .boxSizing();
+          }
+        }
+      }
+    }
+    .btn{
+      background-color: #049BFF;color:#FFF;font-size: 32rpx;margin-bottom: 30rpx;
+    }
+  }
+
+</style>
+
+
+<template>
+  <view class="advice">
+
+    <view class="type">常见问题：</view>
+    <view class="advice-box">
+      <view class="advice-item" wx:for="{{lists}}" wx:key="{{index}}" >
+        <view >
+          <view class="question" data-id="{{index}}" @tap="showAnswer">
+            <view class="title">{{index+1}}.{{item.Q}}</view>
+            <image src="../../static/images/arrow.png" class="icon {{current ===index? 'on':''}}"></image>
+          </view>
+          <view class="answer"  wx:if="{{current===index?true:false}}">
+            <view class="answer-content" >
+              {{item.A}}
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <button class="btn" open-type="contact">联系客服</button>
+      <button class="btn" open-type="feedback">意见反馈</button>
+    </view>
+
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  var mta= require('../../static/js/mta_analysis.js')
+  export default class Advice extends wepy.page{
+    config = {
+      navigationBarTitleText: '意见反馈'
+    };
+    components = {};
+
+    data = {
+      lists: [
+        {
+        Q:"积分怎么兑换礼品?",
+        A:"点击兑换按钮,若弹出客服框,则输入任意内容后回车,客服会回复兑换礼品的公众号二维码,只要长按识别二维码,关注公众号后,点击“兑换积分”按钮,即可兑换。"
+      }, {
+        Q: "怎么加入任务积分福利群?",
+        A: "在任务首页,点击红色的福利群悬浮按钮,若弹出客服框,则输入任意内容后回车,客服会回复兑换礼品的公众号二维码。只要长按识别二维码,关注公众号后,点击“福利群”按钮,即可获得群二维码。"
+      }, {
+        Q: "如何完成任务积分派的任务?",
+        A: "按任务提示,一般是点击任务进去,授权登陆,试玩30秒以上即可完成任务。任务都是小程序,免下载,方便快捷。"
+      }, {
+        Q: "完成任务可以获得多少积分?",
+        A: "每个任务都会显示对应的积分的,一般为0.05~0.20积分不等。"
+      }, {
+        Q: "任务只能做一次吗?",
+        A: "相同的任务只能做一次.咱们会2-4个工作日进行更换一批新任务的。"
+      }, {
+        Q: "我邀请的好友,他做任务,我可否获得积分?",
+        A: "可以的,只要你邀请足够多的好友,就可以躺赚了。"
+      }, {
+        Q: "未兑换的积分会怎么处理?",
+        A: "积分会一直存在帐号中的。"
+      }],
+      current: -1
+    };
+    methods = {
+      showAnswer(event){
+        let id = event.currentTarget.dataset.id;
+        if(this.current === id){
+          this.current = -1;
+        }else{
+          this.current = id;
+        }
+      }
+    };
+
+    events = {};
+    onLoad() {
+      mta.Page.init();
+    };
+  }
+</script>
